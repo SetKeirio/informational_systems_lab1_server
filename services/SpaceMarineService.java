@@ -64,6 +64,10 @@ public class SpaceMarineService {
         return spaceMarineRepository.setCategoryToNull(categoryId);
     }
 
+    public boolean existsByName(String name) {
+        return spaceMarineRepository.existsByName(name);
+    }
+
 
 
 }

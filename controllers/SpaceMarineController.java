@@ -6,6 +6,8 @@ import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -46,6 +48,7 @@ public class SpaceMarineController {
     }
 
     @DeleteMapping("/delete/{id}")
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public ResponseEntity<String> deleteSpaceMarine(@PathVariable int id, HttpServletRequest request) {
         // Получаем токен из заголовков запроса
         String token = request.getHeader("Authorization").substring(7); // предполагаем, что токен передается в формате "Bearer <token>"
@@ -98,6 +101,7 @@ public class SpaceMarineController {
     }
 
     @PostMapping("/create")
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public ResponseEntity<SpaceMarine> createSpaceMarine(@RequestBody SpaceMarineRequest request, HttpServletRequest r) {
         // Convert SpaceMarineRequest to SpaceMarine entity
         String token = r.getHeader("Authorization").substring(7); // предполагаем, что токен передается в формате "Bearer <token>"
@@ -108,6 +112,12 @@ public class SpaceMarineController {
         Claims claims = authService.getClaimsFromToken(token);
         int userIdFromToken = claims.get("userId", Integer.class); // Извлекаем userId из токена (или передать по-другому)
         SpaceMarine marine = new SpaceMarine();
+
+        boolean nameExists = spaceMarineService.existsByName(request.getName());
+        if (nameExists) {
+            return ResponseEntity.status(419).body(null); // Если имя уже существует, возвращаем ошибку с кодом 400
+        }
+
         marine.setName(request.getName());
 
         // Assuming you have a method to convert coordinates
@@ -203,6 +213,7 @@ public class SpaceMarineController {
     }
 
     @PutMapping("/update/{id}")
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public ResponseEntity<SpaceMarine> updateSpaceMarine(@PathVariable int id, @RequestBody SpaceMarineRequest request, HttpServletRequest r) {
         // Получаем токен из заголовков запроса
         String token = r.getHeader("Authorization").substring(7); // предполагаем, что токен передается в формате "Bearer <token>"

@@ -68,5 +68,7 @@ public interface SpaceMarineRepository extends JpaRepository<SpaceMarine, Intege
             " WHERE sm.categoryId IS NULL AND sm.id IN (SELECT sm.id FROM SpaceMarine sm WHERE sm.categoryId = :categoryId)")
     List<SpaceMarineResponse> findUpdatedSpaceMarinesWithNullCategory(@Param("categoryId") Integer categoryId);
 
+    boolean existsByName(String name);
+
 
 }
