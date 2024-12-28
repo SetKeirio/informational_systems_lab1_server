@@ -23,6 +23,9 @@ public class ImportHistory {
 
     private Integer count = 0;  // значение по умолчанию
 
+    @Column(nullable = false)
+    private String filename;
+
     // Getters and Setters
     public Long getId() {
         return id;
@@ -62,5 +65,13 @@ public class ImportHistory {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getFileName() {
+        return filename;
+    }
+
+    public void setFileName(String fileName) {
+        this.filename = fileName;
     }
 }
